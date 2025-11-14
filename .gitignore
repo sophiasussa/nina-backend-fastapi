@@ -1,45 +1,34 @@
-venv/
-env/
-
+# ---- Python ----
 __pycache__/
 *.py[cod]
-*.pyo
-
-*.sqlite3
-
-.vscode/
-
-*.log
-*.pot
-*.pyc
-*.pyd
 *.so
-*.tmp
-*.swp
-*.DS_Store
+
+# ---- Virtual env ----
+venv/
+.env
+.env.* 
+
+# ---- OS Files ----
+.DS_Store
 Thumbs.db
 
-*.mo
-*.pot
+# ---- FastAPI / Uvicorn ----
+*.pid
 
-*/migrations/__pycache__/
-*/migrations/*.pyc
+# ---- Build / cache ----
+build/
+dist/
+*.egg-info/
 
+# ---- Tests ----
 .coverage
 htmlcov/
-.tox/
-nosetests.xml
-coverage.xml
-*.cover
-*.log
 pytest_cache/
 
-node_modules/
+# ---- Static uploads ----
+media/
+uploads/
 
-dist/
-build/
-public/
-
+# ---- IDE ----
+.vscode/
 .idea/
-*.env
-.env.*
