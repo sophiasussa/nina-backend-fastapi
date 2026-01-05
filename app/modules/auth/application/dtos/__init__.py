@@ -1,5 +1,5 @@
-from .login_dto import LoginRequestDTO, LoginResponseDTO, UserResponseDTO
-from .register_dto import RegisterRequestDTO, RegisterResponseDTO
+from .logininput_dto import LoginRequestDTO, LoginResponseDTO, UserResponseDTO
+from .registerinput_dto import RegisterRequestDTO, RegisterResponseDTO
 
 __all__ = [
     "LoginRequestDTO",

@@ -1,7 +1,5 @@
-from typing import Tuple
-
-from app.modules.auth.application.dtos.login_dto import LoginInputDTO
-from app.modules.auth.application.dtos.login_result_dto import LoginResultDTO
+from app.modules.auth.application.dtos.logininput_dto import LoginInputDTO
+from app.modules.auth.application.dtos.loginresult_dto import LoginResultDTO
 from app.modules.auth.domain.repositories.user_repository import UserRepository
 from app.modules.auth.domain.value_objects.email_vo import Email
 from app.modules.auth.domain.exceptions.auth_exceptions import (
@@ -48,23 +46,23 @@ class LoginUseCase:
             InactiveUserException: Usuário inativo
             UserNotFoundException: Usuário não encontrado
         """                
-        try:
-            email_vo = Email(input_dto.email)
-        except ValueError:
-            raise InvalidCredentialsException()
-        
-        user = await self._user_repository.get_by_email(email_vo)
+        credentials = await self._user_repository.get_credentials_by_email(
+            input_dto.email
+        )
 
-        if not user:
-            raise UserNotFoundException(email_vo.value)
+        if not credentials:
+            raise UserNotFoundException(input_dto.email.value)
 
-        password_hash = user.password.hashed
-
-        if not self._password_hasher.verify(input_dto.password, password_hash):
+        if not self._password_hasher.verify(
+            input_dto.password.value,
+            credentials.password_hash,
+        ):
             raise InvalidCredentialsException()
 
-        if not user.can_login():
+        if not credentials.is_active:
             raise InactiveUserException()
+
+        user = await self._user_repository.get_by_id(credentials.user_id)
 
         return LoginResultDTO(
             user_id=user.id,
