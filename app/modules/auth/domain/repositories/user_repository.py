@@ -2,7 +2,7 @@ from abc import ABC, abstractmethod
 from typing import Optional
 
 from app.modules.auth.domain.entities.user_entity import UserEntity
-from app.modules.auth.domain.value_objects.user_id_vo import UserId
+from app.shared.domain.value_objects.id_vo import UserId
 from app.modules.auth.domain.value_objects.email_vo import Email
 
 

@@ -3,7 +3,7 @@ from app.modules.auth.domain.repositories.user_repository import UserRepository
 from app.modules.auth.application.dtos.current_user_result_dto import (
     CurrentUserResultDTO
 )
-from app.modules.auth.domain.value_objects.user_id_vo import UserId
+from app.shared.domain.value_objects.id_vo import UserId
 
 
 class GetCurrentUserUseCase:

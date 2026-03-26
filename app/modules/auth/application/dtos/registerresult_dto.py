@@ -1,7 +1,7 @@
 from dataclasses import dataclass
 from datetime import datetime
 
-from domain.value_objects.user_id_vo import UserId
+from app.shared.domain.value_objects.id_vo import UserId
 from domain.value_objects.name_vo import Name
 from domain.value_objects.email_vo import Email
 
