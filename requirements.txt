@@ -19,6 +19,7 @@ httpx==0.28.1
 idna==3.11
 oauthlib==3.3.1
 passlib==1.7.4
+psycopg2-binary==2.9.12
 pyasn1==0.6.2
 pyasn1_modules==0.4.2
 pycparser==3.0
