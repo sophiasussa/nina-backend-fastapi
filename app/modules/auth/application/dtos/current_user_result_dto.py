@@ -1,9 +1,9 @@
 from dataclasses import dataclass
 from datetime import datetime
 
+from app.modules.auth.domain.value_objects.email_vo import Email
+from app.modules.auth.domain.value_objects.name_vo import Name
 from app.shared.domain.value_objects.id_vo import UserId
-from domain.value_objects.name_vo import Name
-from domain.value_objects.email_vo import Email
 
 
 @dataclass(frozen=True)

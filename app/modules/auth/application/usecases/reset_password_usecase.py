@@ -1,9 +1,9 @@
 from app.modules.auth.domain.value_objects.password_vo import Password
 from app.modules.auth.domain.value_objects.plain_password_vo import PlainPassword
-from app.shared.domain.value_objects.id_vo import Id
 from redis import Redis
 from app.modules.auth.domain.repositories.user_repository import UserRepository
 from app.modules.auth.infrastructure.security.password_hasher import PasswordHasher
+from app.shared.domain.value_objects.id_vo import UserId
 
 
 class ResetPasswordUseCase:
@@ -24,7 +24,7 @@ class ResetPasswordUseCase:
         if not user_id:
             raise ValueError("Token inválido ou expirado")
 
-        user = await self.user_repository.get_by_id(Id(user_id))
+        user = await self.user_repository.get_by_id(UserId(user_id))
         if not user:
             raise ValueError("Usuário não encontrado")
 
@@ -32,7 +32,7 @@ class ResetPasswordUseCase:
         password = Password(hashed)
 
         await self.user_repository.update_password(
-            user_id=Id(user_id),
+            user_id=UserId(user_id),
             password=password,
         )
 

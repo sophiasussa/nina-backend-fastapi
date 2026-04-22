@@ -1,7 +1,7 @@
 from dataclasses import dataclass
 
-from domain.value_objects.email_vo import Email
-from domain.value_objects.plain_password_vo import PlainPassword
+from app.modules.auth.domain.value_objects.email_vo import Email
+from app.modules.auth.domain.value_objects.plain_password_vo import PlainPassword
 
 
 @dataclass(frozen=True)

@@ -4,9 +4,9 @@ from app.modules.auth.domain.repositories.user_repository import UserRepository
 from app.modules.auth.domain.value_objects.password_vo import Password
 from app.modules.auth.presentation.schemas.current_user_response_schema import CurrentUserResponse
 from app.modules.auth.presentation.schemas.login_response import LoginResponse
-from app.shared.domain.value_objects.id_vo import Id
 from app.modules.auth.application.services.jwt_service import JwtService
 from app.modules.auth.application.services.google_token_verifier import GoogleTokenVerifier
+from app.shared.domain.value_objects.id_vo import UserId
 
 
 class GoogleLoginUseCase:
@@ -36,7 +36,7 @@ class GoogleLoginUseCase:
 
         if not user:
             user = UserEntity(
-                id = Id.new(),
+                id = UserId.new(),
                 nome=name,
                 email=email,
                 password=Password.from_hashed(
