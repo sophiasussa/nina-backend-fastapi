@@ -5,7 +5,7 @@ from app.modules.auth.domain.entities.user_entity import UserEntity
 from app.modules.auth.domain.value_objects.email_vo import Email
 from app.modules.auth.domain.value_objects.name_vo import Name
 from app.modules.auth.domain.value_objects.password_vo import Password
-from app.shared.domain.value_objects.id_vo import Id
+from app.shared.domain.value_objects.id_vo import UserId
 from app.shared.infrastructure.database.base import BaseModel
 
 
@@ -37,7 +37,7 @@ class UserModel(BaseModel):
 
     def to_entity(self) -> UserEntity:
         return UserEntity(
-            id=Id(self.id),
+            id=UserId(self.id),
             nome=Name(self.nome),
             email=Email(self.email),
             password=Password(self.password),

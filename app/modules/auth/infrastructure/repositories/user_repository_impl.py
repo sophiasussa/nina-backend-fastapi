@@ -7,8 +7,8 @@ from app.modules.auth.domain.read_models.user_credentials import UserCredentials
 from app.modules.auth.domain.repositories.user_repository import UserRepository
 from app.modules.auth.domain.value_objects.email_vo import Email
 from app.modules.auth.domain.value_objects.password_vo import Password
-from app.shared.domain.value_objects.id_vo import Id
 from app.modules.auth.infrastructure.models.user_model import UserModel
+from app.shared.domain.value_objects.id_vo import UserId
 
 
 
@@ -46,7 +46,7 @@ class UserRepositoryImpl(UserRepository):
         # Converte model para entidade
         return model.to_entity()
 
-    async def get_by_id(self, user_id: Id) -> Optional[UserEntity]:
+    async def get_by_id(self, user_id: UserId) -> Optional[UserEntity]:
         """
         Busca usuário por ID.
         
@@ -106,7 +106,7 @@ class UserRepositoryImpl(UserRepository):
             return None
 
         return UserCredentials(
-            user_id=Id(row.id),
+            user_id=UserId(row.id),
             password_hash=row.password,
             is_active=row.is_active,
         )
@@ -139,7 +139,7 @@ class UserRepositoryImpl(UserRepository):
         
         return user_model.to_entity()
     
-    async def delete(self, user_id: Id) -> bool:
+    async def delete(self, user_id: UserId) -> bool:
         """
         Remove usuário do banco.
         
@@ -162,7 +162,7 @@ class UserRepositoryImpl(UserRepository):
         
         return True
 
-    async def update_password(self, user_id: Id, password: Password) -> None:
+    async def update_password(self, user_id: UserId, password: Password) -> None:
         stmt = select(UserModel).where(UserModel.id == user_id.value)
         user_model = self._db.execute(stmt).scalar_one_or_none()
 

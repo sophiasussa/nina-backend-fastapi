@@ -2,6 +2,8 @@ from fastapi import APIRouter, Depends, Request, status, HTTPException
 from typing import Annotated
 from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
 import traceback
+from app.modules.auth.application.dtos.logininput_dto import LoginInputDTO
+from app.modules.auth.application.dtos.registerinput_dto import RegisterInputDTO
 from app.modules.auth.domain.repositories.session_repository import SessionRepository
 from app.shared.security.rate_limiter import rate_limit
 
@@ -32,10 +34,6 @@ from app.modules.auth.application.usecases.forgot_password_usecase import (
     ForgotPasswordUseCase,
 )
 
-from app.modules.auth.application.dtos import (
-    LoginInputDTO,
-    RegisterInputDTO,
-)
 
 # ===== Domain =====
 from app.modules.auth.domain.value_objects.email_vo import Email
