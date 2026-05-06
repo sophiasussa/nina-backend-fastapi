@@ -37,16 +37,3 @@ def get_db() -> Generator[Session, None, None]:
         yield db
     finally:
         db.close()
-
-
-def init_db() -> None:
-    """
-    Inicializa o banco de dados.
-    Cria todas as tabelas definidas nos models.
-    """
-    from app.shared.infrastructure.database.base import Base
-    
-    # Importar todos os models aqui para que sejam registrados
-    from app.modules.auth.infrastructure.models.user_model import UserModel
-    
-    Base.metadata.create_all(bind=engine)
