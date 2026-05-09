@@ -17,6 +17,7 @@ from app.shared.presentation.exceptions.exception_handlers import (
     generic_exception_handler,
 )
 from app.modules.auth.domain.exceptions.auth_exceptions import AuthException
+from app.shared.presentation.middlewares.cors_middleware import setup_cors
 
 
 @asynccontextmanager
@@ -45,6 +46,8 @@ def health_check():
         "service": "buskei-backend",
     }
 
+
+setup_cors(app)
 
 # middleware
 app.add_middleware(AuthMiddleware)
