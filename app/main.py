@@ -5,6 +5,7 @@ from app.core.config import settings
 from app.infra.redis.redis_client import RedisClient
 from app.infra.redis.session_repository import RedisSessionRepository
 from app.modules.auth.presentation.routes.auth_routes import router as auth_router
+from app.modules.customer.presentation.routes.customer_routes import router as customer_router
 
 from fastapi.exceptions import RequestValidationError
 from sqlalchemy.exc import SQLAlchemyError
@@ -16,6 +17,8 @@ from app.shared.presentation.exceptions.exception_handlers import (
     generic_exception_handler,
 )
 from app.modules.auth.domain.exceptions.auth_exceptions import AuthException
+from app.modules.customer.domain.exceptions.customers_exceptions import CustomerDomainError
+from app.shared.presentation.exceptions.exception_handlers import customer_exception_handler
 from app.shared.presentation.middlewares.cors_middleware import setup_cors
 
 
@@ -50,9 +53,11 @@ setup_cors(app)
 
 # REGISTRA AS ROTAS
 app.include_router(auth_router, prefix="/api/v1")
+app.include_router(customer_router, prefix="/api/v1")
 
 # domínio
 app.add_exception_handler(AuthException, auth_exception_handler)
+app.add_exception_handler(CustomerDomainError, customer_exception_handler)
 
 # validação pydantic
 app.add_exception_handler(RequestValidationError, validation_exception_handler)
