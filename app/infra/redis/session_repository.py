@@ -10,7 +10,7 @@ class RedisSessionRepository(SessionRepository):
         self.redis = redis
 
     def blacklist_access_token(self, token: str, expires_at: datetime) -> None:
-        ttl = int((expires_at - datetime.utcnow()).total_seconds())
+        ttl = int((expires_at - datetime.now(timezone.utc)).total_seconds())
 
         if ttl > 0:
             self.redis.setex(
