@@ -9,6 +9,7 @@ from app.modules.customer.domain.exceptions.customers_exceptions import (
     CustomerAlreadyExistsError,
     CustomerDocumentAlreadyExistsError,
     CustomerInactiveError,
+    CustomerStatusError,
 )
 
 
@@ -33,7 +34,7 @@ async def customer_exception_handler(request: Request, exc: CustomerDomainError)
         status_code = 404
     elif isinstance(exc, (CustomerAlreadyExistsError, CustomerDocumentAlreadyExistsError)):
         status_code = 409
-    elif isinstance(exc, CustomerInactiveError):
+    elif isinstance(exc, (CustomerInactiveError, CustomerStatusError)):
         status_code = 422
     else:
         status_code = 400

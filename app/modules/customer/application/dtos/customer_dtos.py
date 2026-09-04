@@ -60,7 +60,7 @@ class UpdateAddressInputDTO(BaseModel):
     model_config = ConfigDict(extra="forbid")
 
     address: Optional[AddressInputDTO] = Field(
-        None, description="Novo endereço ou null para remover"
+        ..., description="Novo endereço ou null para remover"
     )
 
 

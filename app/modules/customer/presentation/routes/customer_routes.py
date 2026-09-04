@@ -26,6 +26,7 @@ from app.modules.customer.domain.exceptions.customers_exceptions import (
     CustomerDomainError,
     CustomerInactiveError,
     CustomerNotFoundError,
+    CustomerStatusError,
 )
 
 from app.modules.customer.presentation.dependencies.customer_deps import (
@@ -66,7 +67,7 @@ def _handle_domain_error(exc: CustomerDomainError) -> HTTPException:
     if isinstance(exc, (CustomerAlreadyExistsError, CustomerDocumentAlreadyExistsError)):
         return HTTPException(status_code=409, detail=str(exc))
 
-    if isinstance(exc, CustomerInactiveError):
+    if isinstance(exc, (CustomerInactiveError, CustomerStatusError)):
         return HTTPException(status_code=422, detail=str(exc))
 
     return HTTPException(status_code=400, detail=str(exc))

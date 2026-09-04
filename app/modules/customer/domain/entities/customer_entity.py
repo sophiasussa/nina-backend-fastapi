@@ -88,6 +88,11 @@ class CustomerEntity:
             self.phone = phone
         self.updated_at = datetime.utcnow()
 
+    def update_phone(self, phone: Optional[CustomerPhone]) -> None:
+        """Atualiza ou remove o telefone do cliente."""
+        self.phone = phone
+        self.updated_at = datetime.utcnow()
+
     def update_address(self, address: Optional[CustomerAddress]) -> None:
         """
         Atualiza o endereço principal de entrega.

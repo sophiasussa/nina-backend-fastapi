@@ -1,5 +1,8 @@
 from app.modules.customer.application.dtos.customer_dtos import CustomerOutputDTO
-from app.modules.customer.domain.exceptions.customers_exceptions import CustomerNotFoundError
+from app.modules.customer.domain.exceptions.customers_exceptions import (
+    CustomerNotFoundError,
+    CustomerValidationError,
+)
 from app.modules.customer.domain.repositories.customer_repository import CustomerRepository
 from app.modules.customer.domain.value_objects.customer_id import CustomerId
 
@@ -21,7 +24,12 @@ class GetCustomerUseCase:
         self._repository = repository
 
     async def execute(self, customer_id: str) -> CustomerOutputDTO:
-        profile = await self._repository.get_profile(CustomerId(value=customer_id))
+        try:
+            customer_key = CustomerId(value=customer_id)
+        except ValueError as exc:
+            raise CustomerValidationError(field="customer_id", reason=str(exc)) from exc
+
+        profile = await self._repository.get_profile(customer_key)
 
         if not profile:
             raise CustomerNotFoundError(identifier=customer_id)

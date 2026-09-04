@@ -2,7 +2,10 @@ from app.modules.customer.application.dtos.customer_dtos import (
     UpdateCustomerInputDTO,
     CustomerOutputDTO,
 )
-from app.modules.customer.domain.exceptions.customers_exceptions import CustomerNotFoundError
+from app.modules.customer.domain.exceptions.customers_exceptions import (
+    CustomerNotFoundError,
+    CustomerValidationError,
+)
 from app.modules.customer.domain.repositories.customer_repository import CustomerRepository
 from app.modules.customer.domain.value_objects.customer_id import CustomerId
 from app.modules.customer.domain.value_objects.customer_name import CustomerName
@@ -28,18 +31,29 @@ class UpdateCustomerUseCase:
 
     async def execute(self, customer_id: str, dto: UpdateCustomerInputDTO) -> CustomerOutputDTO:
         # 1. Busca entidade
-        entity = await self._repository.get_by_id(CustomerId(value=customer_id))
+        try:
+            customer_key = CustomerId(value=customer_id)
+        except ValueError as exc:
+            raise CustomerValidationError(field="customer_id", reason=str(exc)) from exc
+
+        entity = await self._repository.get_by_id(customer_key)
         if not entity:
             raise CustomerNotFoundError(identifier=customer_id)
 
         # 2. Constrói VOs apenas dos campos enviados
-        new_name = CustomerName(value=dto.name) if dto.name is not None else None
-        new_phone = CustomerPhone.create_optional(dto.phone) if dto.phone is not None else None
+        try:
+            new_name = CustomerName(value=dto.name) if dto.name is not None else None
+            new_phone = CustomerPhone.create_optional(dto.phone) if dto.phone is not None else None
+        except ValueError as exc:
+            raise CustomerValidationError(field="customer", reason=str(exc)) from exc
 
         # 3. Delega mutações à entidade (preserva regras de negócio)
         entity.update_contact_info(name=new_name, phone=new_phone)
 
-        if dto.notes is not None:
+        if "phone" in dto.model_fields_set:
+            entity.update_phone(new_phone)
+
+        if "notes" in dto.model_fields_set:
             entity.update_notes(notes=dto.notes)
 
         # 4. Persiste e retorna

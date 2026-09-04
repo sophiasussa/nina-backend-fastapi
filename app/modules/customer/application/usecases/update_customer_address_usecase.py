@@ -2,7 +2,10 @@ from app.modules.customer.application.dtos.customer_dtos import (
     UpdateAddressInputDTO,
     CustomerOutputDTO,
 )
-from app.modules.customer.domain.exceptions.customers_exceptions import CustomerNotFoundError
+from app.modules.customer.domain.exceptions.customers_exceptions import (
+    CustomerNotFoundError,
+    CustomerValidationError,
+)
 from app.modules.customer.domain.repositories.customer_repository import CustomerRepository
 from app.modules.customer.domain.value_objects.customer_address import CustomerAddress
 from app.modules.customer.domain.value_objects.customer_id import CustomerId
@@ -29,22 +32,30 @@ class UpdateCustomerAddressUseCase:
 
     async def execute(self, customer_id: str, dto: UpdateAddressInputDTO) -> CustomerOutputDTO:
         # 1. Busca entidade
-        entity = await self._repository.get_by_id(CustomerId(value=customer_id))
+        try:
+            customer_key = CustomerId(value=customer_id)
+        except ValueError as exc:
+            raise CustomerValidationError(field="customer_id", reason=str(exc)) from exc
+
+        entity = await self._repository.get_by_id(customer_key)
         if not entity:
             raise CustomerNotFoundError(identifier=customer_id)
 
         # 2. Constrói VO ou None
         address = None
-        if dto.address is not None:
-            address = CustomerAddress(
-                street=dto.address.street,
-                number=dto.address.number,
-                complement=dto.address.complement,
-                neighborhood=dto.address.neighborhood,
-                city=dto.address.city,
-                state=dto.address.state,
-                zip_code=dto.address.zip_code,
-            )
+        try:
+            if dto.address is not None:
+                address = CustomerAddress(
+                    street=dto.address.street,
+                    number=dto.address.number,
+                    complement=dto.address.complement,
+                    neighborhood=dto.address.neighborhood,
+                    city=dto.address.city,
+                    state=dto.address.state,
+                    zip_code=dto.address.zip_code,
+                )
+        except ValueError as exc:
+            raise CustomerValidationError(field="address", reason=str(exc)) from exc
 
         # 3. Delega à entidade
         entity.update_address(address=address)

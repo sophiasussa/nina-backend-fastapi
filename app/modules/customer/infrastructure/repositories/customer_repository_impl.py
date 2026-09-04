@@ -1,10 +1,15 @@
 from typing import List, Optional
 
 from sqlalchemy import func, or_, select
+from sqlalchemy.exc import IntegrityError
 from sqlalchemy.orm import Session
 
 from app.modules.customer.domain.entities.customer_entity import CustomerEntity
-from app.modules.customer.domain.exceptions.customers_exceptions import CustomerNotFoundError
+from app.modules.customer.domain.exceptions.customers_exceptions import (
+    CustomerAlreadyExistsError,
+    CustomerDocumentAlreadyExistsError,
+    CustomerNotFoundError,
+)
 from app.modules.customer.domain.read_models.customer_rm import (
     CustomerProfile,
     CustomerSummary,
@@ -44,7 +49,13 @@ class CustomerRepositoryImpl(CustomerRepository):
         model = CustomerModel.from_entity(customer)
 
         self._db.add(model)
-        self._db.commit()
+        try:
+            self._db.commit()
+        except IntegrityError as exc:
+            self._db.rollback()
+            if customer.document and await self.exists_by_document(customer.document):
+                raise CustomerDocumentAlreadyExistsError(customer.document.value) from exc
+            raise CustomerAlreadyExistsError(customer.email.value) from exc
         self._db.refresh(model)
 
         return model.to_entity()
@@ -72,7 +83,11 @@ class CustomerRepositoryImpl(CustomerRepository):
 
         model.update_from_entity(customer)
 
-        self._db.commit()
+        try:
+            self._db.commit()
+        except Exception:
+            self._db.rollback()
+            raise
         self._db.refresh(model)
 
         return model.to_entity()
@@ -94,7 +109,11 @@ class CustomerRepositoryImpl(CustomerRepository):
             return False
 
         self._db.delete(model)
-        self._db.commit()
+        try:
+            self._db.commit()
+        except Exception:
+            self._db.rollback()
+            raise
 
         return True
 

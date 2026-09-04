@@ -6,6 +6,7 @@ from app.modules.customer.domain.entities.customer_entity import CustomerEntity
 from app.modules.customer.domain.exceptions.customers_exceptions import (
     CustomerAlreadyExistsError,
     CustomerDocumentAlreadyExistsError,
+    CustomerValidationError,
 )
 from app.modules.customer.domain.repositories.customer_repository import CustomerRepository
 from app.modules.customer.domain.value_objects.customer_address import CustomerAddress
@@ -30,23 +31,25 @@ class CreateCustomerUseCase:
         self._repository = repository
 
     async def execute(self, dto: CreateCustomerInputDTO) -> CustomerOutputDTO:
-        # 1. Constrói Value Objects
-        name = CustomerName(value=dto.name)
-        email = CustomerEmail(value=dto.email)
-        phone = CustomerPhone.create_optional(dto.phone)
-        document = CustomerDocument.create_optional(dto.document)
+        try:
+            name = CustomerName(value=dto.name)
+            email = CustomerEmail(value=dto.email)
+            phone = CustomerPhone.create_optional(dto.phone)
+            document = CustomerDocument.create_optional(dto.document)
 
-        address = None
-        if dto.address:
-            address = CustomerAddress(
-                street=dto.address.street,
-                number=dto.address.number,
-                complement=dto.address.complement,
-                neighborhood=dto.address.neighborhood,
-                city=dto.address.city,
-                state=dto.address.state,
-                zip_code=dto.address.zip_code,
-            )
+            address = None
+            if dto.address:
+                address = CustomerAddress(
+                    street=dto.address.street,
+                    number=dto.address.number,
+                    complement=dto.address.complement,
+                    neighborhood=dto.address.neighborhood,
+                    city=dto.address.city,
+                    state=dto.address.state,
+                    zip_code=dto.address.zip_code,
+                )
+        except ValueError as exc:
+            raise CustomerValidationError(field="customer", reason=str(exc)) from exc
 
         # 2. Verifica unicidade
         if await self._repository.exists_by_email(email):

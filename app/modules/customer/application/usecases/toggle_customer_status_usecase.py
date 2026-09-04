@@ -1,5 +1,9 @@
 from app.modules.customer.application.dtos.customer_dtos import CustomerOutputDTO
-from app.modules.customer.domain.exceptions.customers_exceptions import CustomerNotFoundError
+from app.modules.customer.domain.exceptions.customers_exceptions import (
+    CustomerNotFoundError,
+    CustomerStatusError,
+    CustomerValidationError,
+)
 from app.modules.customer.domain.repositories.customer_repository import CustomerRepository
 from app.modules.customer.domain.value_objects.customer_id import CustomerId
 
@@ -20,11 +24,19 @@ class ActivateCustomerUseCase:
         self._repository = repository
 
     async def execute(self, customer_id: str) -> CustomerOutputDTO:
-        entity = await self._repository.get_by_id(CustomerId(value=customer_id))
+        try:
+            customer_key = CustomerId(value=customer_id)
+        except ValueError as exc:
+            raise CustomerValidationError(field="customer_id", reason=str(exc)) from exc
+
+        entity = await self._repository.get_by_id(customer_key)
         if not entity:
             raise CustomerNotFoundError(identifier=customer_id)
 
-        entity.activate()
+        try:
+            entity.activate()
+        except ValueError as exc:
+            raise CustomerStatusError(customer_id, str(exc)) from exc
 
         updated = await self._repository.update(entity)
         return CustomerOutputDTO.from_entity(updated)
@@ -46,11 +58,19 @@ class DeactivateCustomerUseCase:
         self._repository = repository
 
     async def execute(self, customer_id: str) -> CustomerOutputDTO:
-        entity = await self._repository.get_by_id(CustomerId(value=customer_id))
+        try:
+            customer_key = CustomerId(value=customer_id)
+        except ValueError as exc:
+            raise CustomerValidationError(field="customer_id", reason=str(exc)) from exc
+
+        entity = await self._repository.get_by_id(customer_key)
         if not entity:
             raise CustomerNotFoundError(identifier=customer_id)
 
-        entity.deactivate()
+        try:
+            entity.deactivate()
+        except ValueError as exc:
+            raise CustomerStatusError(customer_id, str(exc)) from exc
 
         updated = await self._repository.update(entity)
         return CustomerOutputDTO.from_entity(updated)

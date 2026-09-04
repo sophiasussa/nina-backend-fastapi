@@ -69,7 +69,7 @@ class UpdateAddressSchema(BaseModel):
     model_config = ConfigDict(extra="forbid")
 
     address: Optional[AddressSchema] = Field(
-        None, description="Novo endereço ou null para remover o existente"
+        ..., description="Novo endereço ou null para remover o existente"
     )
 
 

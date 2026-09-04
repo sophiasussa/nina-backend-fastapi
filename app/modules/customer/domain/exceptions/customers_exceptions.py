@@ -37,6 +37,15 @@ class CustomerInactiveError(CustomerDomainError):
         )
 
 
+class CustomerStatusError(CustomerDomainError):
+    """Raised when the requested status transition is invalid."""
+
+    def __init__(self, customer_id: str, reason: str):
+        self.customer_id = customer_id
+        self.reason = reason
+        super().__init__(f"Invalid status change for customer '{customer_id}': {reason}")
+
+
 class CustomerValidationError(CustomerDomainError):
     """Levantado quando dados do cliente não passam na validação de domínio."""
 
