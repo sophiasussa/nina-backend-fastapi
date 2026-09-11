@@ -4,7 +4,6 @@ from typing import Optional
 from sqlalchemy import Boolean, DateTime, String, Text
 from sqlalchemy.orm import Mapped, mapped_column
 
-from app.shared.infrastructure.database.base import BaseModel
 
 from app.modules.customer.domain.entities.customer_entity import CustomerEntity
 from app.modules.customer.domain.value_objects.customer_id import CustomerId
@@ -13,9 +12,10 @@ from app.modules.customer.domain.value_objects.customer_email import CustomerEma
 from app.modules.customer.domain.value_objects.customer_phone import CustomerPhone
 from app.modules.customer.domain.value_objects.customer_document import CustomerDocument
 from app.modules.customer.domain.value_objects.customer_address import CustomerAddress
+from app.shared.infrastructure.database.base_orm import BaseORMModel
 
 
-class CustomerModel(BaseModel):
+class CustomerModel(BaseORMModel):
     """
     Model ORM que representa a tabela 'customers' no banco de dados.
 
