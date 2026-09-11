@@ -52,6 +52,6 @@ def test_should_accept_password_with_exactly_8_characters():
 
 
 def test_should_accept_password_with_exactly_64_characters():
-    password = PlainPassword("a" * 64)
+    password = PlainPassword("a" * 63 + "1")
 
     assert len(password.value) == 64

@@ -10,10 +10,10 @@ from app.shared.domain.value_objects.id_vo import UserId
 
 def make_user() -> UserEntity:
     return UserEntity(
-        id=UserId(),
+        id=UserId.new(),
         nome=Name("Sophia"),
         email=Email("sophia@example.com"),
-        password=Password("12345678"),
+        password=Password("a" * 60),
     )
 
 
@@ -82,7 +82,7 @@ def test_should_not_change_password_when_user_is_inactive():
         ValueError,
         match="Usuário desativado não pode executar esta ação",
     ):
-        user.change_password(Password("newpassword123"))
+        user.change_password(Password("a" * 60))
 
 
 def test_should_not_mutate_original_user():
