@@ -1,4 +1,4 @@
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, ConfigDict, Field
 from .current_user_response_schema import CurrentUserResponse
 
 class RegisterResponse(BaseModel):
@@ -14,7 +14,7 @@ class RegisterResponse(BaseModel):
     token_type: str = Field(default="Bearer", description="Tipo do token")
     message: str = Field(default="Usuário criado com sucesso", description="Mensagem de sucesso")
     
-    class Config:
+    model_config = ConfigDict(
         json_schema_extra = {
             "example": {
                 "user": {
@@ -30,3 +30,4 @@ class RegisterResponse(BaseModel):
                 "message": "Usuário criado com sucesso"
             }
         }
+    )

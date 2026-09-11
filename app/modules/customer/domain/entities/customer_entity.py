@@ -1,5 +1,5 @@
-from dataclasses import dataclass, field
-from datetime import datetime
+from dataclasses import dataclass
+from datetime import datetime, timezone
 from typing import Optional
 
 from app.modules.customer.domain.value_objects.customer_address import CustomerAddress
@@ -56,7 +56,7 @@ class CustomerEntity:
         Returns:
             CustomerEntity: Nova entidade de cliente
         """
-        now = datetime.utcnow()
+        now = datetime.now(timezone.utc)
         return cls(
             id=CustomerId.generate(),
             name=name,
@@ -86,12 +86,12 @@ class CustomerEntity:
             self.name = name
         if phone is not None:
             self.phone = phone
-        self.updated_at = datetime.utcnow()
+        self.updated_at = datetime.now(timezone.utc)
 
     def update_phone(self, phone: Optional[CustomerPhone]) -> None:
         """Atualiza ou remove o telefone do cliente."""
         self.phone = phone
-        self.updated_at = datetime.utcnow()
+        self.updated_at = datetime.now(timezone.utc)
 
     def update_address(self, address: Optional[CustomerAddress]) -> None:
         """
@@ -101,7 +101,7 @@ class CustomerEntity:
             address: Novo endereço ou None para remover
         """
         self.address = address
-        self.updated_at = datetime.utcnow()
+        self.updated_at = datetime.now(timezone.utc)
 
     def update_notes(self, notes: Optional[str]) -> None:
         """
@@ -113,18 +113,18 @@ class CustomerEntity:
             notes: Novas observações ou None para limpar
         """
         self.notes = notes
-        self.updated_at = datetime.utcnow()
+        self.updated_at = datetime.now(timezone.utc)
 
     def deactivate(self) -> None:
         """Desativa o cliente, impedindo novos pedidos."""
         if not self.is_active:
             raise ValueError("Cliente já está inativo.")
         self.is_active = False
-        self.updated_at = datetime.utcnow()
+        self.updated_at = datetime.now(timezone.utc)
 
     def activate(self) -> None:
         """Reativa um cliente previamente desativado."""
         if self.is_active:
             raise ValueError("Cliente já está ativo.")
         self.is_active = True
-        self.updated_at = datetime.utcnow()
+        self.updated_at = datetime.now(timezone.utc)

@@ -1,4 +1,4 @@
-from pydantic import BaseModel, EmailStr, Field, field_validator
+from pydantic import BaseModel, ConfigDict, EmailStr, Field, field_validator
 
 class RegisterRequest(BaseModel):
     """
@@ -12,19 +12,19 @@ class RegisterRequest(BaseModel):
         min_length=2,
         max_length=100,
         description="Nome completo do usuário",
-        example="João Silva"
+        json_schema_extra={"example": "João Silva"},
     )
     email: EmailStr = Field(
         ...,
         description="Email do usuário",
-        example="joao@example.com"
+        json_schema_extra={"example": "joao@example.com"},
     )
     senha: str = Field(
         ...,
         min_length=6,
         max_length=100,
         description="Senha do usuário",
-        example="senha123"
+        json_schema_extra={"example": "senha123"},
     )
     
     @field_validator('nome')
@@ -44,7 +44,7 @@ class RegisterRequest(BaseModel):
             raise ValueError("Senha deve conter pelo menos uma letra")
         return v
     
-    class Config:
+    model_config = ConfigDict(
         json_schema_extra = {
             "example": {
                 "nome": "João Silva",
@@ -52,3 +52,4 @@ class RegisterRequest(BaseModel):
                 "senha": "senha123"
             }
         }
+    )

@@ -1,4 +1,4 @@
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, ConfigDict, Field
 
 
 class RefreshTokenResponse(BaseModel):
@@ -19,10 +19,10 @@ class RefreshTokenResponse(BaseModel):
     expires_in: int = Field(
         ...,
         description="Tempo de expiração do token em segundos",
-        example=3600
+        json_schema_extra={"example": 3600},
     )
 
-    class Config:
+    model_config = ConfigDict(
         json_schema_extra = {
             "example": {
                 "access_token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...",
@@ -30,3 +30,4 @@ class RefreshTokenResponse(BaseModel):
                 "expires_in": 3600
             }
         }
+    )

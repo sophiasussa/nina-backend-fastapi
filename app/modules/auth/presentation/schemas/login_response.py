@@ -1,4 +1,4 @@
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, ConfigDict, Field
 
 from app.modules.auth.presentation.schemas.current_user_response_schema import CurrentUserResponse
 
@@ -16,7 +16,7 @@ class LoginResponse(BaseModel):
     token_type: str = Field(default="Bearer", description="Tipo do token")
     expires_in: int = Field(..., description="Tempo de expiração em segundos")
     
-    class Config:
+    model_config = ConfigDict(
         json_schema_extra = {
             "example": {
                 "user": {
@@ -32,3 +32,4 @@ class LoginResponse(BaseModel):
                 "expires_in": 1800
             }
         }
+    )
