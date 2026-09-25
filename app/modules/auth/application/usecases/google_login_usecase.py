@@ -1,7 +1,11 @@
+import secrets
+
 from app.core.config import settings
 from app.modules.auth.domain.entities.user_entity import UserEntity
+from app.modules.auth.domain.exceptions.auth_exceptions import InactiveUserException
 from app.modules.auth.domain.repositories.user_repository import UserRepository
 from app.modules.auth.domain.value_objects.password_vo import Password
+from app.modules.auth.infrastructure.security.password_hasher import PasswordHasher
 from app.modules.auth.presentation.schemas.current_user_response_schema import CurrentUserResponse
 from app.modules.auth.presentation.schemas.login_response import LoginResponse
 from app.modules.auth.application.services.jwt_service import JwtService
@@ -15,10 +19,12 @@ class GoogleLoginUseCase:
         user_repository: UserRepository,
         google_token_verifier: GoogleTokenVerifier,
         jwt_service: JwtService,
+        password_hasher: PasswordHasher,
     ):
         self.user_repository = user_repository
         self.google_token_verifier = google_token_verifier
         self.jwt_service = jwt_service
+        self.password_hasher = password_hasher
 
     async def execute(self, id_token: str):
         # Valida token com Google
@@ -39,13 +45,13 @@ class GoogleLoginUseCase:
                 id = UserId.new(),
                 nome=name,
                 email=email,
-                password=Password.from_hashed(
-                    "GOOGLE_EXTERNAL_AUTH_NO_PASSWORD_1234567890"
-                ),
+                password=Password(self.password_hasher.hash(secrets.token_urlsafe(32))),
                 is_active=True,
             )
 
             await self.user_repository.create(user)
+        elif not user.can_login():
+            raise InactiveUserException()
 
         # Gera tokens
         access_token = self.jwt_service.create_access_token(

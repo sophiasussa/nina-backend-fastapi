@@ -11,6 +11,11 @@ class RefreshTokenResponse(BaseModel):
         description="Novo access token JWT"
     )
 
+    refresh_token: str = Field(
+        ...,
+        description="Novo refresh token JWT"
+    )
+
     token_type: str = Field(
         default="Bearer",
         description="Tipo do token"
@@ -26,6 +31,7 @@ class RefreshTokenResponse(BaseModel):
         json_schema_extra = {
             "example": {
                 "access_token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...",
+                "refresh_token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...",
                 "token_type": "Bearer",
                 "expires_in": 3600
             }

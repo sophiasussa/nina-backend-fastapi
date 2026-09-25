@@ -5,6 +5,7 @@ import pytest
 from app.modules.auth.application.dtos.logininput_dto import LoginInputDTO
 from app.modules.auth.application.dtos.registerinput_dto import RegisterInputDTO
 from app.modules.auth.application.usecases.login_usecase import LoginUseCase
+from app.modules.auth.application.usecases.getcurrentuser_usecase import GetCurrentUserUseCase
 from app.modules.auth.application.usecases.register_usecase import RegisterUseCase
 from app.modules.auth.application.usecases.reset_password_usecase import ResetPasswordUseCase
 from app.modules.auth.domain.exceptions.auth_exceptions import (
@@ -18,6 +19,7 @@ from app.modules.auth.domain.read_models.user_credentials import UserCredentials
 from app.modules.auth.domain.value_objects.email_vo import Email
 from app.modules.auth.domain.value_objects.name_vo import Name
 from app.modules.auth.domain.value_objects.plain_password_vo import PlainPassword
+from app.shared.domain.value_objects.id_vo import UserId
 
 
 class InMemoryUserRepository:
@@ -138,3 +140,32 @@ def test_reset_password_rejects_missing_or_expired_token():
 
     with pytest.raises(InvalidTokenException):
         run(use_case.execute("expired-token", PlainPassword("newpass123")))
+
+
+def test_reset_password_rejects_token_for_deleted_user():
+    class RedisWithStaleResetToken:
+        @staticmethod
+        def get(key):
+            return str(UserId.new().value)
+
+    use_case = ResetPasswordUseCase(
+        user_repository=InMemoryUserRepository(),
+        redis=RedisWithStaleResetToken(),
+        password_hasher=DeterministicPasswordHasher(),
+    )
+
+    with pytest.raises(InvalidTokenException):
+        run(use_case.execute("stale-token", PlainPassword("newpass123")))
+
+
+def test_get_current_user_returns_user_and_rejects_missing_user_or_invalid_id():
+    repository = InMemoryUserRepository()
+    user = run(RegisterUseCase(repository, DeterministicPasswordHasher()).execute(registration_input()))
+    use_case = GetCurrentUserUseCase(repository)
+
+    assert run(use_case.execute(str(user.id.value))).id == user.id
+
+    with pytest.raises(UserNotFoundException):
+        run(use_case.execute(str(UserId.new().value)))
+    with pytest.raises(ValueError):
+        run(use_case.execute("not-a-uuid"))

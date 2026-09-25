@@ -189,11 +189,13 @@ def get_google_login_usecase(
     user_repository: UserRepository = Depends(get_user_repository),
     google_token_verifier: GoogleTokenVerifier = Depends(get_google_token_verifier),
     jwt_service: JwtService = Depends(get_jwt_service),
+    password_hasher: PasswordHasher = Depends(get_password_hasher),
 ) -> GoogleLoginUseCase:
     return GoogleLoginUseCase(
         user_repository=user_repository,
         google_token_verifier=google_token_verifier,
         jwt_service=jwt_service,
+        password_hasher=password_hasher,
     )
 
 

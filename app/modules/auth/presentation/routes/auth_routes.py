@@ -404,6 +404,8 @@ async def google_login(
     body: GoogleLoginRequest,
     usecase: Annotated[GoogleLoginUseCase, Depends(get_google_login_usecase)],
     redis: Annotated[Redis, Depends(get_redis)],
+    session_repo: Annotated[SessionRepository, Depends(get_session_repository)],
+    jwt_handler: Annotated[JWTHandler, Depends(get_jwt_handler)],
 ):
     """
     Realiza login ou cadastro usando conta Google.
@@ -417,4 +419,14 @@ async def google_login(
         window_seconds=60,
     )
 
-    return await usecase.execute(body.id_token)
+    response = await usecase.execute(body.id_token)
+    refresh_payload = jwt_handler.decode_token(
+        response.refresh_token,
+        expected_type=TOKEN_TYPE_REFRESH,
+    )
+    session_repo.store_refresh_token(
+        jti=refresh_payload["jti"],
+        user_id=refresh_payload["sub"],
+        ttl_seconds=settings.REFRESH_TOKEN_EXPIRE_DAYS * 24 * 60 * 60,
+    )
+    return response

@@ -112,5 +112,5 @@ class InvalidTokenException(AuthException):
     - Casos de uso que dependem de token válido
     """
 
-    def __init__(self):
-        super().__init__("Token inválido ou expirado")
+    def __init__(self, message: str = "Token inválido ou expirado"):
+        super().__init__(message)
