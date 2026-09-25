@@ -1,4 +1,5 @@
 from app.modules.auth.domain.value_objects.password_vo import Password
+from app.modules.auth.domain.exceptions.auth_exceptions import InvalidTokenException
 from app.modules.auth.domain.value_objects.plain_password_vo import PlainPassword
 from redis import Redis
 from app.modules.auth.domain.repositories.user_repository import UserRepository
@@ -22,11 +23,11 @@ class ResetPasswordUseCase:
 
         user_id = self.redis.get(redis_key)
         if not user_id:
-            raise ValueError("Token inválido ou expirado")
+            raise InvalidTokenException()
 
         user = await self.user_repository.get_by_id(UserId(user_id))
         if not user:
-            raise ValueError("Usuário não encontrado")
+            raise InvalidTokenException()
 
         hashed = self.password_hasher.hash(new_password.value)
         password = Password(hashed)

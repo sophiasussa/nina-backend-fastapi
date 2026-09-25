@@ -2,6 +2,7 @@ from google.oauth2 import id_token
 from google.auth.transport import requests
 from fastapi.concurrency import run_in_threadpool
 
+from app.core.config import settings
 from app.modules.auth.application.services.google_token_verifier import GoogleTokenVerifier
 from app.modules.auth.domain.value_objects.email_vo import Email
 from app.modules.auth.domain.value_objects.name_vo import Name
@@ -15,8 +16,7 @@ class GoogleTokenVerifierImpl(GoogleTokenVerifier):
                 id_token.verify_oauth2_token,
                 token,
                 requests.Request(),
-                # deixa SEM client_id por enquanto
-                None,
+                settings.GOOGLE_CLIENT_ID,
             )
 
 
